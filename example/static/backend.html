@@ -1,0 +1,98 @@
+<html>
+<head>
+    <style>
+    .block {
+        display: block;
+        margin-top: 10px;
+        margin-bottom: 30px;
+        border: solid 1px silver;
+        padding: 5px;
+    }
+    code {
+        background: silver;
+        border: solid 1px #444444;
+    }
+    </style>
+</head>
+<body>
+    <h3>Include of content</h3>
+    <div>Click here to see this in 'quiet' mode: <a href="/quiet/example">Quiet View</a></div>
+    <p>To see this in debug mode, append ?cx-debug=true: <a href="?cx-debug=true">Debug Mode</a></p>
+    <code>
+        &lt;div cx-url=&#039;{{server:local}}/include.html&#039; cx-cache-key=&#039;shakespeare&#039; cx-cache-ttl=&#039;10s&#039; class=&#039;block&#039;&gt;&lt;/div&gt;
+    </code>
+    <div cx-url='{{server:local}}/include.html' cx-cache-key='shakespeare' cx-cache-ttl='10s' class='block'>
+        This will be replaced with some simple content that is cached if a cache is configured.
+    </div>
+
+    <h3>Dynamic content cached for 10s</h3>
+    <code>
+        &lt;div cx-url=&#039;{{server:local}}/dynamic&#039; cx-cache-key=&#039;dynamic&#039; cx-cache-ttl=&#039;10s&#039; class=&#039;block&#039;&gt;&lt;/div&gt;
+    </code>
+    <div cx-url='{{server:local}}/dynamic' cx-cache-key='dynamic' cx-cache-ttl='10s' class='block'>
+        This will be replaced with some dynamic content that is cached if a cache is configured.
+    </div>
+
+    <h3>Service that fails</h3>
+    <code>
+        &lt;div cx-url=&#039;{{server:local}}/500&#039; cx-cache-key=&#039;500&#039; cx-cache-ttl=&#039;10s&#039; class=&#039;block&#039;&gt;&lt;/div&gt;
+    </code>
+    <div cx-url='{{server:local}}/500' cx-cache-key='500' cx-cache-ttl='10s' class='block'>
+        This is a call to a service that will fail, the configuration does not have quietFail = true, so will tell you it has failed.
+        <div>You can put HTML <b>tags</b> and <i>stuff</i> inside blocks as defaults</div>
+    </div>
+
+     <h3>Service that is sometimes faulty with cache</h3>
+    <code>
+        &lt;div cx-url=&#039;{{server:local}}/faulty&#039; cx-cache-key=&#039;faulty-cache&#039; cx-cache-ttl=&#039;10s&#039; class=&#039;block&#039;&gt;&lt;/div&gt;
+    </code>
+    <div cx-url='{{server:local}}/faulty' cx-cache-key='faulty-cache' cx-cache-ttl='10s' cx-timeout="1s" class='block'>
+        This is a call to a service that is faulty 50% of the time, uncached to demonstrate circuit breaker.
+    </div>
+
+    <h3>Service that is sometimes faulty with no cache</h3>
+    <code>
+        &lt;div cx-url=&#039;{{server:local}}/faulty&#039; cx-cache-key=&#039;faulty-nocache&#039; cx-cache-ttl=&#039;0&#039; class=&#039;block&#039;&gt;&lt;/div&gt;
+    </code>
+    <div cx-url='{{server:local}}/faulty' cx-cache-key='faulty-nocache' cx-cache-ttl='0' cx-timeout="1s" class='block'>
+        This is a call to a service that is faulty 50% of the time, uncached to demonstrate circuit breaker.
+    </div>
+
+    <h3>Service that is slow</h3>
+    <code>
+        &lt;div cx-url=&#039;{{server:local}}/slow&#039; cx-cache-key=&#039;error&#039; cx-cache-ttl=&#039;10s&#039; class=&#039;block&#039;&gt;&lt;/div&gt;
+    </code>
+    <div cx-url='{{server:local}}/slow' cx-cache-key='slowservice' cx-cache-ttl='10s' cx-timeout="20" class='block'>
+        This is a call to a service that is slower than the timeout.
+    </div>
+
+    <h3>Logic</h3>
+    <p>Append ?logic=true to the url to show how simple mustache based logic statements can be used to construct URLs as well as query keys</p>
+    <code>
+        &lt;div id=&#039;testlogic&#039; cx-test=&#039;{{#query:logic}}Logic ftw!{{/query:logic}}&#039;&gt;&lt;/div&gt;
+    </code>
+    <div id='testlogic' cx-test='{{#query:logic}}Logic ftw!{{/query:logic}}' class='block'></div>
+
+    <h3>Dynamic No Cache</h3>
+    <p>It may be that you want to disable the cache for a fragment programmatically - e.g. if a user has a specific role.</p>
+    <code>
+        &lt;div id=&#039;testnocache&#039; cx-url=&#039;{{server:local}}/dynamic&#039; cx-cache-key=&#039;dynamic&#039; cx-cache-ttl=&#039;10s&#039; cx-no-cache=&#039;{{#query:nocache}}true{{/query:nocache}}&#039;&gt;&lt;/div&gt;
+    </code>
+    <div id='testnocache' cx-url='{{server:local}}/dynamic' cx-cache-key='dynamicnocache' cx-cache-ttl='10s' cx-no-cache='{{#query:nocache}}true{{/query:nocache}}' class='block'></div>
+
+    <h3>Bundle Inclusion</h3>
+    <p>If you use bosco to manage micro service static bundles there is a quick way to include these in your page (view source).  Note that in real life these are typically attached a script or style tag with cx-replace-outer="true".</p>
+    <code>
+        &lt;div id=&#039;bundles&#039; cx-bundles=&#039;bottom.js,top.js&#039;&gt;&lt;/div&gt;
+    </code>
+    <div id='bundles' cx-bundles='service/bottom.js,service/top.js'></div>
+    <h3>POST etc.</h3>
+    <p>Compoxure will directly pass straight through any non GET request to the appropriate backend.</p>
+    <div id='testpost' class='block'>
+        <form action="/post?hello=world" method="POST">
+            Post: <input name="test"></input>
+            <button name="submit" type="submit">Submit</button>
+        </form>
+</body>
+
+</html>
