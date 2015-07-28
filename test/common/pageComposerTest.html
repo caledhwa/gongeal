@@ -1,0 +1,44 @@
+<html>
+    <body>
+        <div id='declarative' cx-url='{{server:local}}/replaced' cx-cache-ttl='1' cx-cache-key='replace:declarative:me' cx-timeout='1s' class='block'>
+            Content to be replaced via a directive
+        </div>
+        <div id='declarativeStale' cx-url='{{server:local}}/500' cx-cache-ttl='1' cx-cache-key='replace:declarative:me' cx-timeout='1s' class='block'>
+            Content should be replaced by stale content
+        </div>
+        <div id='declarativePrime' cx-url='{{server:local}}/replaced' cx-cache-ttl='20s' cx-cache-key='primed' cx-timeout='1s' class='block'>
+            Content to be replaced via a directive
+        </div>
+        <div id='broken' cx-url='{{server:local}}/broken' cx-timeout='1s' class='block'>Broken service</div>
+        <div id='faulty' cx-url='{{server:local}}/500' cx-timeout='1s' class='block'>Faulty service</div>
+        <div id='faultyhtml' cx-url='{{server:local}}/500' cx-timeout='1s' class='block'>
+            <h1>Bob</h1>
+            <span>The builder</span>
+        </div>
+         <div id='invalidurl' cx-url='invalid' cx-timeout='1s' class='block'>
+            Invalid url
+        </div>
+        <div id='cacheurl1' cx-url='cache' cx-timeout='1s' class='block'>
+            Cache url
+        </div>
+        <div id='cacheurl2' cx-url='cache' cx-cache-key="primed" class='block'>
+            Cache url with key primed (above)
+        </div>
+        <div id='no-store' cx-url='{{server:local}}/millis' cx-timeout='10s' class='block'>
+            Not stored
+        </div>
+        <div id='max-age' cx-url='{{server:local}}/millis-maxage' cx-timeout='10s' class='block'>
+            Not stored
+        </div>
+        <div id='cookie' cx-url='{{server:local}}/cookie' cx-no-cache="true" cx-timeout='10s' class='block'>
+            Cookie
+        </div>
+        <div id='accept' cx-accept='application/json' cx-url='{{server:local}}/header/accept' cx-no-cache="true" cx-timeout='10s' class='block'>
+            Accept Header Directive
+        </div>
+        <div id='country' cx-url='{{server:local}}/country?geo={{cookie:geo}}' cx-no-cache="true" cx-timeout='10s' class='block'></div>
+        <div id='replace-outer'>wrapping <div id='replace-outer-content' cx-replace-outer='true' cx-url='{{server:local}}/replaced'></div> content</div>
+         <div id='testlogic' cx-test='{{#query:logic}}Logic ftw!{{/query:logic}}'></div>
+         <div id='environment' cx-test='{{env:name}}'></div>
+    </body>
+</html>
