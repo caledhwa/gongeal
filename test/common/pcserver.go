@@ -2,32 +2,35 @@ package common
 
 import (
 	"log"
-	"time"
 	"net"
 	"net/http"
-	"github.com/drone/routes"
+	"strconv"
 )
 
-func StartPageCompositionServer (port string) {
+func StartPageCompositionServer (port int, hostname string, eventHandler func(), config string ) {
 
-	log.Printf("Starting PcServer at Port%s\n", port)
+	var configValue string
+	if config != "" {
+		configValue = config
+	} else {
+		configValue = "testConfig"
+	}
+	configValue += ".json"
 
-	mux := routes.New()
+	//var config = require('./' + (configFile || 'testConfig') + '.json');
+
+	portString := ":" + strconv.Itoa(port)
+	log.Printf("Starting PcServer at Port: %v\n", portString)
 
 	// Serves static pages
 	log.Println("Serving / - serves Page Composition html files for testing")
-	mux.Get("/:param", func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Filepath:%s\n","../common/" + r.URL.Path[1:])
-		t1 := time.Now()
-		http.ServeFile(w, r, "../common/" + r.URL.Path[1:])
-		t2 := time.Now()
-		log.Printf("[PAGE COMPOSITION] [%s] %q %v\n", r.Method, r.URL.String(), t2.Sub(t1))
-	})
 
-	log.Println("Listening on" + port)
 
-	server := &http.Server{Handler: mux}
-	listener, err := net.Listen("tcp", port)
+	log.Println("Listening on " + portString)
+
+	server := &http.Server { Handler: &StaticHandler{} }
+
+	listener, err := net.Listen("tcp", portString)
 	if nil != err {
 		log.Fatalln(err)
 	}
@@ -35,3 +38,5 @@ func StartPageCompositionServer (port string) {
 		log.Fatalln(err)
 	}
 }
+
+

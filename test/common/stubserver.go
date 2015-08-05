@@ -3,30 +3,21 @@ package common
 import (
 	"log"
 	"net"
-	"time"
 	"net/http"
-	"github.com/drone/routes"
+	"strconv"
 )
 
-func StartStubServer (port string) {
+func StartStubServer (port int) {
 
-	log.Printf("Starting Stub at Port%s", port)
-
-	mux := routes.New()
+	portString := ":" + strconv.Itoa(port)
+	log.Printf("Starting Stub at Port: %v\n", portString)
 
 	// Serves static pages
 	log.Println("Serving / - serves Stub html files for testing")
-	mux.Get("/:param", func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Filepath:%s\n","../common/" + r.URL.Path[1:])
-		t1 := time.Now()
-		http.ServeFile(w, r, "../common/" + r.URL.Path[1:])
-		t2 := time.Now()
-		log.Printf("[STUB] [%s] %q %v\n", r.Method, r.URL.String(), t2.Sub(t1))
-	})
+	server := &http.Server { Handler: &StaticHandler{} }
 
-	log.Println("Listening on" + port)
-	server := &http.Server{Handler: mux}
-	listener, err := net.Listen("tcp", port)
+	log.Println("Listening on " + portString)
+	listener, err := net.Listen("tcp", portString)
 	if nil != err {
 		log.Fatalln(err)
 	}
