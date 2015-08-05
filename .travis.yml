@@ -1,12 +1,19 @@
 language: go
-
 go:
-    - 1.4.2
-
+- 1.4.2
 install:
-    - go get github.com/onsi/ginkgo
-    - go get github.com/onsi/gomega
-    - go get github.com/sclevine/agouti
-    - go get github.com/PuerkitoBio/goquery
-
-script: go test -v github.com/caledhwa/gongeal/test/acceptance -run ^TestAcceptance$
+- go get github.com/hoisie/mustache
+- go get golang.org/x/net/html
+- go get github.com/drone/routes
+- go get github.com/onsi/ginkgo
+- go get github.com/onsi/gomega
+- go get github.com/sclevine/agouti
+- go get github.com/PuerkitoBio/goquery
+- go get golang.org/x/tools/cmd/cover
+- go get github.com/axw/gocov/gocov
+- go get github.com/mattn/goveralls
+script:
+- $HOME/gopath/bin/goveralls -service=travis-ci -repotoken $COVERALLS_TOKEN
+- go test -v github.com/caledhwa/gongeal/test/acceptance -run ^TestAcceptance$
+env:
+  secure: MYExEHVJU20WDNJE5EkUQouCRFHMPxbK/hoLIzs42IfVc0wmGbSszPu7bSBjkN5qMG+6paLQKv2Ma4Zi/FdjmFUMlDDLQBQjaVZ6ZQskkNVFU+g7rk7KAEkbLfPsgdYqPJdr7G1Cl4nEQv5WwgUDcYj6xlJ7Zz15nXQDc7SLYDjDDjYpzfiuttca9oqXyiYVaC1ByFETpaaMdm2LMCea2GLmSeoZ2rIVhuuSK+PzCWGy/vNj5GthKAFZUI0ZTw8V/kwX+UPGaXhk2jKaXtiloiR2DWsHmuaawXgeSGZtcY7hUi7avYvKIxd2K0gEYB3tEUKk68bfWZFBnGCGsWBcVW8/MIrV7bZmYyRkBl1iY6BdjdzG8LaLVS8gt1Sya3hG1+h590DuZ065iPrWgn9Wt8y5iPCCkdJblFAhOBQhv6zyra55DN+oQilr2lpI8bKTxVbHeX/m+teQtK89+LnWzbRLcdmBrVRnKHJYQZHIHqhlrgtX8g4suKUOmELW2aO+EkAxGCt/6fuj8+5cSUlnnFnHz//OIYsltdpJ9tFFfu6GhWJ+FDPj79TMTuLhCCgKgKmg5v8t/5iLp3KhI9Wu63xY/tovVW8WldxZSL80YnH+oEkKiZx+7AfglBgPN+P9Smv2/UVUUvDy+WyXkgFMuhn64BU6Mw/Eg7txe0/I5bk=
