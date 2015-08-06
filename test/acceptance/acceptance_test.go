@@ -3,8 +3,6 @@ package acceptance
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/sclevine/agouti"
-
 	"testing"
 	"../common"
 	"net/url"
@@ -16,50 +14,22 @@ import (
 )
 
 const PAGE_COMPOSITION_PORT int = 5001
+var client *http.Client
 
 func TestAcceptance(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Acceptance Suite")
 }
 
-var agoutiDriver *agouti.WebDriver
-var client *http.Client
-
 var _ = BeforeSuite(func() {
 
-	agoutiDriver = agouti.PhantomJS()
 	client = &http.Client{}
 
 	go common.StartPageCompositionServer(PAGE_COMPOSITION_PORT,"localhost",func(){},"")
 	go common.StartStubServer(5002)
-
-	Expect(agoutiDriver.Start()).To(Succeed())
-})
-
-var _ = AfterSuite(func() {
-	Expect(agoutiDriver.Stop()).To(Succeed())
 })
 
 var _ = Describe("Page Composer", func() {
-
-	var page *agouti.Page
-
-	BeforeEach(func() {
-		var err error
-		page, err = agoutiDriver.NewPage(agouti.Browser("chrome"))
-		Expect(err).NotTo(HaveOccurred())
-	})
-
-	AfterEach(func() {
-		Expect(page.Destroy()).To(Succeed())
-	})
-
-	// I added this test to simply prove out the agouti framework
-	// on one of the static pages in the test/common folder
-	It("should deliver a page with a #faulty tag with 'Faulty service' text", func() {
-		Expect(page.Navigate(GetPageComposerUrl("pageComposerTest.html",""))).To(Succeed())
-		Expect(page.All("#faulty").Text()).To(BeEquivalentTo("Faulty service"))
-	})
 
 	// I added this test to prove out the ability for goquery
 	// to repeat the same activity as above - confirm #faulty value
@@ -400,7 +370,7 @@ var _ = Describe("Page Composer", func() {
 	})
 
 	It("should create a default handler if none provided", func() {
-		go common.StartPageCompositionServer(5002,"localhost", func() {},"")
+		go common.StartPageCompositionServer(5003,"localhost", func() {},"")
 	})
 
 	It("should allow use of variables in a backend target", func() {
