@@ -9,7 +9,6 @@ import (
 type StaticHandler struct {}
 
 func (self *StaticHandler) ServeHTTP (w http.ResponseWriter, r *http.Request) {
-	log.Printf("Filepath:%s\n","../common" + r.URL.Path[0:])
 	t1 := time.Now()
 	http.ServeFile(w, r, "../common" + r.URL.Path[0:])
 	t2 := time.Now()
