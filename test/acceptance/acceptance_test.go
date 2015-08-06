@@ -370,7 +370,7 @@ var _ = Describe("Page Composer", func() {
 	})
 
 	It("should create a default handler if none provided", func() {
-		go common.StartPageCompositionServer(5002,"localhost", func() {},"")
+		go common.StartPageCompositionServer(5003,"localhost", func() {},"")
 	})
 
 	It("should allow use of variables in a backend target", func() {
