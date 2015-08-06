@@ -14,7 +14,7 @@ install:
 - go get github.com/mattn/goveralls
 - go get github.com/modocache/gover
 script:
-- go test go test ./... -cover
+- ginkgo -r --randomizeAllSpecs -cover
 - gover
 - goveralls -service travis-ci -coverprofile=gover.coverprofile -repotoken $COVERALLS_TOKEN
 # $HOME/gopath/bin/goveralls -service=travis-ci -repotoken $COVERALLS_TOKEN
