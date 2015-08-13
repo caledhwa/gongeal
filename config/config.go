@@ -1,4 +1,4 @@
-package gongeal
+package config
 
 type Config struct {
 

@@ -1,42 +1,35 @@
-package gongeal
+package main
 
 import (
-	"fmt"
 	"net/http"
-	"os"
-	"github.com/hoisie/mustache"
-	"golang.org/x/net/html"
+	"github.com/justinas/alice"
+	"./middleware"
+	"./config"
 )
 
 func main() {
 
-	port := ":1338"
+	config := &config.Config{}
 
-	fmt.Println("Setting up handler...")
-	http.HandleFunc("/", handle)
-	http.HandleFunc("/mustache", mustacheTest)
+	cleanInvalidUri := middleware.NewCleanInvalidUriMiddleware(config)
+	dropFavicon := middleware.NewFaviconMiddleware(config)
+	// cache
+	interrogateRequest := middleware.NewInterrogatorMiddleware(config)
+	selectBackend := middleware.NewSelectBackendMiddleware(config)
+	rejectUnsupportedMediaTypes := middleware.NewRejectUnsupportedMediaTypeMiddleware(config)
+	passthrough := middleware.NewPassthroughMiddleware(config)
+	// cookieParser
+	backendProxy := middleware.NewBackendProxyMiddleware(config)
 
-	fmt.Println("Listening on" + port)
-	http.ListenAndServe(port, nil)
-}
+	chain := alice.New(	cleanInvalidUri.Handle,
+					   	dropFavicon.Handle,
+					   	interrogateRequest.Handle,
+						selectBackend.Handle,
+						rejectUnsupportedMediaTypes.Handle,
+						passthrough.Handle,
+						backendProxy.Handle).ThenFunc(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello world!"))
+	}))
 
-func mustacheTest(w http.ResponseWriter, r *http.Request) {
-	data := mustache.Render("hello {{c}}", map[string]string{"c": "world"})
-	fmt.Fprintln(w, "Mustache Test: "+data)
-}
-
-func handle(w http.ResponseWriter, r *http.Request) {
-	file, _ := os.Open("test.html")
-	tokenizer := html.NewTokenizer(file)
-
-	fmt.Fprintln(w, "----------- Start Tokens ---------------")
-
-	for {
-		if tokenizer.Next() == html.ErrorToken {
-			break
-		}
-		fmt.Fprintln(w, "Token: "+tokenizer.Token().String())
-	}
-
-	fmt.Fprintln(w, "----------- End Tokens ---------------")
+	http.ListenAndServe(":8000", chain)
 }
