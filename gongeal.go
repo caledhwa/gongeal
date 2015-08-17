@@ -3,8 +3,8 @@ package main
 import (
 	"net/http"
 	"github.com/justinas/alice"
-	"./middleware"
-	"./config"
+	"github.com/caledhwa/gongeal/middleware"
+	"github.com/caledhwa/gongeal/config"
 )
 
 func main() {
