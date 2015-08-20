@@ -4,6 +4,7 @@ import (
 	"github.com/caledhwa/gongeal/config"
 	"github.com/caledhwa/gongeal/util"
 	"net/http"
+	"net/url"
 )
 
 type RequestInterrogator struct {
@@ -11,13 +12,20 @@ type RequestInterrogator struct {
 }
 
 func NewRequestInterrogator(configuration *config.Config) (*RequestInterrogator)  {
-	return &RequestInterrogator{}
+
+	return &RequestInterrogator{Configuration:configuration}
 }
 
 func (interrogator *RequestInterrogator) InterrogateRequest(request *http.Request) (map[string]string) {
 	params :=  make(map[string]string)
 
-	pageUrl := GetPageUrl(request)
+	queryParams := interrogator.interrogateParams(request.URL.Query())
+	pageUrl := getPageUrl(request)
+
+	for key, value := range queryParams {
+		params["param:" + key] = value
+	}
+
 	params["url:href"] = pageUrl
 	encodedUrl, _ := util.EncodeUrl(pageUrl)
 	params["url:href:encoded"] = encodedUrl
@@ -25,7 +33,7 @@ func (interrogator *RequestInterrogator) InterrogateRequest(request *http.Reques
 	return params
 }
 
-func GetPageUrl(request *http.Request) string {
+func getPageUrl(request *http.Request) string {
 
 	var pageUrl string
 
@@ -52,3 +60,15 @@ func GetPageUrl(request *http.Request) string {
 	return pageUrl
 }
 
+func (interrogator *RequestInterrogator) interrogateParams(params url.Values) map[string]string {
+	returnParams := make(map[string]string)
+	if interrogator.Configuration.Query != nil {
+		for _, item := range interrogator.Configuration.Query {
+			queryItem := params.Get(item.Key)
+			if queryItem != "" {
+				returnParams[item.MapTo] = queryItem
+			}
+		}
+	}
+	return returnParams
+}

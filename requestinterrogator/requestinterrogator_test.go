@@ -33,7 +33,7 @@ var _ = Describe("Request Interrogator", func() {
 	It("should generate the url object", func() {
 		req, _ := http.NewRequest("GET","/teaching-resource/Queen-Elizabeth-II-Diamond-jubilee-2012-6206420", nil)
 		req.Header.Add("host","localhost:5000")
-		interrogator := NewRequestInterrogator(&configuration) //TODO {name:'test'}
+		interrogator := NewRequestInterrogator(&configuration)
 		params := interrogator.InterrogateRequest(req)
 		expectedPageUrl := "http://localhost:5000/teaching-resource/Queen-Elizabeth-II-Diamond-jubilee-2012-6206420"
 		encodedExpectedPageUrl, _ := util.EncodeUrl(expectedPageUrl)
@@ -42,7 +42,12 @@ var _ = Describe("Request Interrogator", func() {
 	})
 
 	It("should extract parameters from the query", func() {
-
+		req, _ := http.NewRequest("GET","/teaching-resource?storyCode=2206421", nil)
+		req.Header.Add("host","localhost:5000")
+		testConfig := &config.Config { Query: []config.Query { config.Query {"storyCode", "resourceId"} }}
+		interrogator := NewRequestInterrogator(testConfig)
+		params := interrogator.InterrogateRequest(req)
+		Expect(params).To(HaveKeyWithValue("param:resourceId","2206421"))
 	})
 
 	It("should only extract parameters from the query when they're not empty", func() {

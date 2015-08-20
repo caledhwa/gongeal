@@ -1,5 +1,10 @@
 package config
 
+type Query struct {
+	Key string `json:"key"`
+	MapTo string `json:"mapTo"`
+}
+
 type Config struct {
 
 	Backend []struct {
@@ -55,4 +60,6 @@ type Config struct {
 		} `json:"403"`
 
 	} `json:"statusCodeHandlers"`
+
+	Query []Query `json:"query"`
 }
