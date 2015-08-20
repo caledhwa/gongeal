@@ -5,8 +5,8 @@ import (
 	. "github.com/onsi/gomega"
 	"testing"
 	"net/http"
-	"net/url"
 	"github.com/caledhwa/gongeal/config"
+	"github.com/caledhwa/gongeal/util"
 	"os"
 	"encoding/json"
 )
@@ -36,7 +36,7 @@ var _ = Describe("Request Interrogator", func() {
 		interrogator := NewRequestInterrogator(&configuration) //TODO {name:'test'}
 		params := interrogator.InterrogateRequest(req)
 		expectedPageUrl := "http://localhost:5000/teaching-resource/Queen-Elizabeth-II-Diamond-jubilee-2012-6206420"
-		encodedExpectedPageUrl, _ := UrlEncoded(expectedPageUrl)
+		encodedExpectedPageUrl, _ := util.EncodeUrl(expectedPageUrl)
 		Expect(params).To(HaveKeyWithValue("url:href",expectedPageUrl))
 		Expect(params).To(HaveKeyWithValue("url:href:encoded",encodedExpectedPageUrl))
 	})
@@ -85,12 +85,3 @@ var _ = Describe("Request Interrogator", func() {
 
 	})
 })
-
-// UrlEncoded encodes a string like Javascript's encodeURIComponent()
-func UrlEncoded(str string) (string, error) {
-	u, err := url.Parse(str)
-	if err != nil {
-		return "", err
-	}
-	return u.String(), nil
-}
