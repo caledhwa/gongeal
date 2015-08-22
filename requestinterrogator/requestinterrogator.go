@@ -5,24 +5,30 @@ import (
 	"github.com/caledhwa/gongeal/util"
 	"net/http"
 	"net/url"
+	"regexp"
 )
 
 type RequestInterrogator struct {
-	Configuration *config.Config
+	configParams *config.Parameters
 }
 
-func NewRequestInterrogator(configuration *config.Config) (*RequestInterrogator)  {
+func NewRequestInterrogator(configParams *config.Parameters) (*RequestInterrogator)  {
 
-	return &RequestInterrogator{Configuration:configuration}
+	return &RequestInterrogator{configParams:configParams}
 }
 
 func (interrogator *RequestInterrogator) InterrogateRequest(request *http.Request) (map[string]string) {
 	params :=  make(map[string]string)
 
 	queryParams := interrogator.interrogateParams(request.URL.Query())
+	templateParams := interrogator.interrogatePath(request.URL.Path)
 	pageUrl := getPageUrl(request)
 
 	for key, value := range queryParams {
+		params["param:" + key] = value
+	}
+
+	for key, value := range templateParams {
 		params["param:" + key] = value
 	}
 
@@ -60,10 +66,24 @@ func getPageUrl(request *http.Request) string {
 	return pageUrl
 }
 
+func (interrogator *RequestInterrogator) interrogatePath(path string) map[string]string {
+	returnParams := make(map[string]string)
+	for _,url := range interrogator.configParams.Urls {
+		r, _ := regexp.Compile(url.Pattern)
+		matches := r.FindAllStringSubmatch(path, -1)
+		if len(matches) > 0 {
+			for i, match := range matches[0][1:] {
+				returnParams[url.Names[i]] = match
+			}
+		}
+	}
+	return returnParams
+}
+
 func (interrogator *RequestInterrogator) interrogateParams(params url.Values) map[string]string {
 	returnParams := make(map[string]string)
-	if interrogator.Configuration.Query != nil {
-		for _, item := range interrogator.Configuration.Query {
+	if interrogator.configParams.Query != nil {
+		for _, item := range interrogator.configParams.Query {
 			queryItem := params.Get(item.Key)
 			if queryItem != "" {
 				returnParams[item.MapTo] = queryItem
