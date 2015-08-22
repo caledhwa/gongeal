@@ -1,6 +1,5 @@
-//
-//package acceptance
-//
+package acceptance
+
 //
 //import (
 //	. "github.com/onsi/ginkgo"
