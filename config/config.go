@@ -1,5 +1,29 @@
 package config
 
+type Query struct {
+	Key string `json:"key"`
+	MapTo string `json:"mapTo"`
+}
+
+type Url struct {
+	Names []string `json:"names"`
+	Pattern string   `json:"pattern"`
+}
+
+type Parameters struct {
+	Query []Query `json:"query"`
+
+	Servers struct {
+			  Local string `json:"local"`
+		  } `json:"servers"`
+
+	Urls []Url `json:"urls"`
+}
+
+type Cdn struct {
+	URL string `json:"url"`
+}
+
 type Config struct {
 
 	Backend []struct {
@@ -11,9 +35,7 @@ type Config struct {
 	   	Engine string `json:"engine"`
 	} `json:"cache"`
 
-	Cdn struct {
-	URL string `json:"url"`
-	} `json:"cdn"`
+	Cdn Cdn `json:"cdn"`
 
 	Circuitbreaker struct {
 	   ErrorThreshold  int `json:"errorThreshold"`
@@ -28,18 +50,7 @@ type Config struct {
 
 	FollowRedirect bool `json:"followRedirect"`
 
-	Parameters struct {
-
-		Servers struct {
-			Local string `json:"local"`
-		} `json:"servers"`
-
-		Urls []struct {
-			Names []string `json:"names"`
-			Pattern string   `json:"pattern"`
-		} `json:"urls"`
-
-	} `json:"parameters"`
+	Parameters Parameters `json:"parameters"`
 
 	StatusCodeHandlers struct {
 
@@ -55,4 +66,6 @@ type Config struct {
 		} `json:"403"`
 
 	} `json:"statusCodeHandlers"`
+
+
 }
