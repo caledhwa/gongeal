@@ -20,6 +20,10 @@ type Parameters struct {
 	Urls []Url `json:"urls"`
 }
 
+type Cdn struct {
+	URL string `json:"url"`
+}
+
 type Config struct {
 
 	Backend []struct {
@@ -31,9 +35,7 @@ type Config struct {
 	   	Engine string `json:"engine"`
 	} `json:"cache"`
 
-	Cdn struct {
-	URL string `json:"url"`
-	} `json:"cdn"`
+	Cdn Cdn `json:"cdn"`
 
 	Circuitbreaker struct {
 	   ErrorThreshold  int `json:"errorThreshold"`

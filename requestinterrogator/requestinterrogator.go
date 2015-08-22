@@ -6,15 +6,17 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"strings"
 )
 
 type RequestInterrogator struct {
 	configParams *config.Parameters
+	configCdn *config.Cdn
 }
 
-func NewRequestInterrogator(configParams *config.Parameters) (*RequestInterrogator)  {
+func NewRequestInterrogator(configParams *config.Parameters, configCdn *config.Cdn) (*RequestInterrogator)  {
 
-	return &RequestInterrogator{configParams:configParams}
+	return &RequestInterrogator{configParams:configParams, configCdn:configCdn}
 }
 
 func (interrogator *RequestInterrogator) InterrogateRequest(request *http.Request) (map[string]string) {
@@ -32,9 +34,41 @@ func (interrogator *RequestInterrogator) InterrogateRequest(request *http.Reques
 		params["param:" + key] = value
 	}
 
+	for key, value := range request.URL.Query() {
+		queryValues := value[0]
+		for _,val := range value[1:] {
+			queryValues = queryValues + "," + val
+		}
+		params["query:" + key] = queryValues
+	}
+
+	for key, value := range request.Header {
+		headerValues := value[0]
+		for _,val := range value[1:] {
+			headerValues = headerValues + "," + val
+		}
+		params["header:" + strings.ToLower(key)] = headerValues
+	}
+
+	for _, value := range request.Cookies() {
+		params["cookie:" + value.Name] = value.Value
+	}
+
+	if interrogator.configCdn != nil && interrogator.configCdn.URL != "" {
+		params["cdn:url"] = interrogator.configCdn.URL
+	}
+
 	params["url:href"] = pageUrl
-	encodedUrl, _ := util.EncodeUrl(pageUrl)
-	params["url:href:encoded"] = encodedUrl
+
+	encodedParams := make(map[string]string)
+	for key, value := range params {
+		encodedValue, _ := util.EncodeUrl(value)
+		encodedParams[key + ":encoded"] = encodedValue
+	}
+
+	for key, value := range encodedParams {
+		params[key] = value
+	}
 
 	return params
 }
