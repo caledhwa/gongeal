@@ -1,5 +1,6 @@
 package acceptance
 
+
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -436,3 +437,4 @@ func GetSection(path string, search string, query string, next func(string)) {
 	Expect(err).NotTo(HaveOccurred())
 	next(doc.Find(query).Text())
 }
+
