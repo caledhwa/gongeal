@@ -16,7 +16,7 @@ install:
 - go get -v github.com/onsi/ginkgo/ginkgo
 - export PATH=$PATH:$HOME/gopath/bin
 script:
-- ginkgo -r -skipPackage=github.com/caledhwa/gongeal/test/acceptance --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --compilers=2
+- ginkgo -skipPackage=github.com/caledhwa/gongeal/test/acceptance --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --compilers=2
 - gover
 - goveralls -service travis-ci -coverprofile=gover.coverprofile -repotoken $COVERALLS_TOKEN
 env:
