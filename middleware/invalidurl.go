@@ -3,7 +3,7 @@ package middleware
 import (
 	"log"
 	"net/http"
-	"../config"
+	"github.com/caledhwa/gongeal/config"
 )
 
 type CleanInvalidUriMiddleware struct {
