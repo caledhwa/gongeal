@@ -28,7 +28,7 @@ func main() {
 						rejectUnsupportedMediaTypes.Handle,
 						passthrough.Handle,
 						backendProxy.Handle).ThenFunc(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello world!"))
+						w.Write([]byte("Hello world!"))
 	}))
 
 	http.ListenAndServe(":8000", chain)
