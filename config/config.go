@@ -24,12 +24,21 @@ type Cdn struct {
 	URL string `json:"url"`
 }
 
+type Backend struct {
+	Pattern string `json:"pattern"`
+	Target string `json:"target"`
+	Host string `json:"host"`
+	TTL string `json:"ttl"`
+	Quietfailure bool `json:"quietFailure"`
+	Leavecontentonfail bool `json:"leaveContentOnFail"`
+	Dontpassurl bool `json:"dontPassUrl"`
+	Passthrough bool `json:"passThrough"`
+	Contenttypes []string `json:"contentTypes"`
+}
+
 type Config struct {
 
-	Backend []struct {
-		Pattern string `json:"pattern"`
-		Target  string `json:"target"`
-	} `json:"backend"`
+	Backend []Backend `json:"backend"`
 
 	Cache struct {
 	   	Engine string `json:"engine"`
@@ -66,6 +75,4 @@ type Config struct {
 		} `json:"403"`
 
 	} `json:"statusCodeHandlers"`
-
-
 }
