@@ -11,7 +11,6 @@ func main() {
 
 	config := &config.Config{}
 
-	cleanInvalidUri := middleware.NewCleanInvalidUriMiddleware(config)
 	dropFavicon := middleware.NewFaviconMiddleware(config)
 	// cache
 	interrogateRequest := middleware.NewInterrogatorMiddleware(config)
@@ -21,8 +20,7 @@ func main() {
 	// cookieParser
 	backendProxy := middleware.NewBackendProxyMiddleware(config)
 
-	chain := alice.New(	cleanInvalidUri.Handle,
-					   	dropFavicon.Handle,
+	chain := alice.New(	dropFavicon.Handle,
 					   	interrogateRequest.Handle,
 						selectBackend.Handle,
 						rejectUnsupportedMediaTypes.Handle,
