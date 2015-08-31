@@ -7,15 +7,20 @@ import (
 	"github.com/caledhwa/gongeal/config"
 	"os"
 	"encoding/json"
+	"log"
 )
 
 func main() {
 
 	// TEMP CONFIG CODE TO PULL FROM CONFIG IN TEST FOLDER
-	configFile, _ := os.Open("test/common/testConfig.json")
+	//configFile, _ := os.Open("test/common/testConfig.json")
+	configFile, _ := os.Open("example/config.json")
 	jsonParser := json.NewDecoder(configFile)
 	var configuration config.Config
 	_ = jsonParser.Decode(&configuration)
+
+	configuration.SelectorFunctions = make(map[string]config.BackendSelectorFunction)
+	configuration.SelectorFunctions["selectGoogle"] = selectGoogle
 
 	dropFavicon := middleware.NewFaviconMiddleware(&configuration)
 	// cache
@@ -36,4 +41,14 @@ func main() {
 	}))
 
 	http.ListenAndServe(":8000", chain)
+}
+
+func selectGoogle (r *http.Request, parameters map[string]string) bool {
+	log.Println("Executing the selectGoogle function")
+	if _,ok := parameters["query:google"] ; ok {
+		log.Println("Google Found.")
+		return true
+	} else {
+		return false
+	}
 }

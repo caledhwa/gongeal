@@ -1,4 +1,5 @@
 package config
+import "net/http"
 
 type Query struct {
 	Key string `json:"key"`
@@ -29,14 +30,20 @@ type Backend struct {
 	Target string `json:"target"`
 	Host string `json:"host"`
 	TTL string `json:"ttl"`
-	Quietfailure bool `json:"quietFailure"`
-	Leavecontentonfail bool `json:"leaveContentOnFail"`
-	Dontpassurl bool `json:"dontPassUrl"`
-	Passthrough bool `json:"passThrough"`
-	Contenttypes []string `json:"contentTypes"`
+	QuietFailure bool `json:"quietFailure"`
+	LeaveContentOnFail bool `json:"leaveContentOnFail"`
+	DontPassUrl bool `json:"dontPassUrl"`
+	PassThrough bool `json:"passThrough"`
+	ContentTypes []string `json:"contentTypes"`
+	Fn string `json:"fn"`
 }
 
+type BackendSelectorFunction func (*http.Request, map[string]string) bool
+type StatusCodeHandlerFunction func(*http.Request, http.ResponseWriter, map[string]string, interface{} )
+
 type Config struct {
+
+	SelectorFunctions map[string]BackendSelectorFunction `json:"selectorFunctions"`
 
 	Backend []Backend `json:"backend"`
 
