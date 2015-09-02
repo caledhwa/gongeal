@@ -3,6 +3,7 @@ package middleware
 import (
 	"log"
 	"net/http"
+	"regexp"
 	"github.com/caledhwa/gongeal/config"
 	"github.com/caledhwa/gongeal/util"
 	"github.com/gorilla/context"
@@ -27,14 +28,18 @@ func (middleware *SelectBackendMiddleware) Handle(h http.Handler) http.Handler {
 			var capturedBackend *config.Backend
 			for _,backend := range middleware.config.Backend {
 				if backend.Pattern != "" {
-
-					// if the pattern exists, return bool after running pattern vs. URL
+					backendMatched, _ :=  regexp.MatchString(backend.Pattern,r.URL.String())
+					if (backendMatched) {
+						log.Println("Found backend based on pattern")
+						capturedBackend = &backend
+						break
+					}
 				} else if backend.Fn != "" && middleware.config.SelectorFunctions[backend.Fn] != nil {
 					log.Println("Found the function")
 					rv := context.Get(r, "templateParameters")
 					if middleware.config.SelectorFunctions[backend.Fn](r,rv.(map[string]string)) {
 						capturedBackend = &backend
-						break;
+						break
 					}
 				}
 			}
@@ -44,8 +49,9 @@ func (middleware *SelectBackendMiddleware) Handle(h http.Handler) http.Handler {
 				w.WriteHeader(http.StatusNotFound)
 			} else {
 				log.Println("Backend selected")
+				setBackendDefaults(capturedBackend)
 				util.PrintJson(capturedBackend)
-				// Add defaults
+
 				// Render the target
 				// Render the cache key
 			}
@@ -53,4 +59,22 @@ func (middleware *SelectBackendMiddleware) Handle(h http.Handler) http.Handler {
 
 		h.ServeHTTP(w,r)
 	})
+}
+
+func setBackendDefaults(capturedBackend *config.Backend) {
+
+	truep := true
+	falsep := false
+	if capturedBackend.DontPassUrl == nil {
+		capturedBackend.DontPassUrl = &truep
+	}
+	if capturedBackend.LeaveContentOnFail == nil {
+		capturedBackend.LeaveContentOnFail = &truep
+	}
+	if capturedBackend.QuietFailure == nil {
+		capturedBackend.QuietFailure = &falsep
+	}
+	if capturedBackend.ReplaceOuter == nil {
+		capturedBackend.ReplaceOuter = &falsep
+	}
 }

@@ -30,10 +30,11 @@ type Backend struct {
 	Target string `json:"target"`
 	Host string `json:"host"`
 	TTL string `json:"ttl"`
-	QuietFailure bool `json:"quietFailure"`
-	LeaveContentOnFail bool `json:"leaveContentOnFail"`
-	DontPassUrl bool `json:"dontPassUrl"`
+	QuietFailure *bool `json:"quietFailure"`
+	LeaveContentOnFail *bool `json:"leaveContentOnFail"`
+	DontPassUrl *bool `json:"dontPassUrl"`
 	PassThrough bool `json:"passThrough"`
+	ReplaceOuter *bool  `json:"replaceOuter"`
 	ContentTypes []string `json:"contentTypes"`
 	Fn string `json:"fn"`
 }
