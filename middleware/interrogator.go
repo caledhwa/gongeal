@@ -6,7 +6,6 @@ import (
 	"github.com/gorilla/context"
 	"github.com/caledhwa/gongeal/config"
 	"github.com/caledhwa/gongeal/requestinterrogator"
-	"github.com/caledhwa/gongeal/util"
 )
 
 type InterrogatorMiddleware struct {
@@ -24,7 +23,6 @@ func (middleware *InterrogatorMiddleware) Handle(h http.Handler) http.Handler {
 
 		templateParameters := middleware.interrogator.InterrogateRequest(r)
 		context.Set(r, "templateParameters", templateParameters)
-		util.PrintJson(templateParameters)
 		log.Println("interrogator called")
 		h.ServeHTTP(w,r)
 	})

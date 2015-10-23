@@ -1,4 +1,5 @@
 package config
+import "net/http"
 
 type Query struct {
 	Key string `json:"key"`
@@ -24,12 +25,30 @@ type Cdn struct {
 	URL string `json:"url"`
 }
 
+type Backend struct {
+	Pattern string `json:"pattern"`
+	Target string `json:"target"`
+	Host string `json:"host"`
+	Timeout string `json:"timeout"`
+	CacheKey string `json:"cacheKey"`
+	TTL int `json:"ttl"`
+	QuietFailure *bool `json:"quietFailure"`
+	LeaveContentOnFail *bool `json:"leaveContentOnFail"`
+	DontPassUrl *bool `json:"dontPassUrl"`
+	PassThrough bool `json:"passThrough"`
+	ReplaceOuter *bool  `json:"replaceOuter"`
+	ContentTypes []string `json:"contentTypes"`
+	Fn string `json:"fn"`
+}
+
+type BackendSelectorFunction func (*http.Request, map[string]string) bool
+type StatusCodeHandlerFunction func(*http.Request, http.ResponseWriter, map[string]string, interface{} )
+
 type Config struct {
 
-	Backend []struct {
-		Pattern string `json:"pattern"`
-		Target  string `json:"target"`
-	} `json:"backend"`
+	SelectorFunctions map[string]BackendSelectorFunction `json:"selectorFunctions"`
+
+	Backend []Backend `json:"backend"`
 
 	Cache struct {
 	   	Engine string `json:"engine"`
@@ -66,6 +85,4 @@ type Config struct {
 		} `json:"403"`
 
 	} `json:"statusCodeHandlers"`
-
-
 }
