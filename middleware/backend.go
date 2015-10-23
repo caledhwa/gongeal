@@ -59,24 +59,25 @@ func (middleware *SelectBackendMiddleware) Handle(h http.Handler) http.Handler {
 				log.Print("Printing template params...")
 				util.PrintJson(params)
 
-				// Render the target
 				log.Printf("Grabbing target: %v",capturedBackend.Target)
 				resp, err := http.Get(capturedBackend.Target)
 				if err != nil {
-					panic(err)
+					log.Println("Backend not found")
+					w.WriteHeader(http.StatusNotFound)
 				}
 				defer resp.Body.Close()
 				body, err := ioutil.ReadAll(resp.Body)
 				if err != nil {
-					panic(err)
+					log.Println("Backend not read")
+					w.WriteHeader(http.StatusNotFound)
+				} else {
+
+					log.Printf("Backend Target response code: %f",resp.Status)
+					renderedTarget := mustache.Render(string(body),params)
+					context.Set(r,"renderedTarget",renderedTarget)
+
+					// TODO: Caching of Backend
 				}
-
-				log.Printf("Backend Target response code: %f",resp.Status)
-				renderedTarget := mustache.Render(string(body),params)
-				context.Set(r,"renderedTarget",renderedTarget)
-
-				// TODO: Caching of Backend
-
 			}
 		}
 
