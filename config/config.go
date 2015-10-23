@@ -31,7 +31,7 @@ type Backend struct {
 	Host string `json:"host"`
 	Timeout string `json:"timeout"`
 	CacheKey string `json:"cacheKey"`
-	TTL string `json:"ttl"`
+	TTL int `json:"ttl"`
 	QuietFailure *bool `json:"quietFailure"`
 	LeaveContentOnFail *bool `json:"leaveContentOnFail"`
 	DontPassUrl *bool `json:"dontPassUrl"`
