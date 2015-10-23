@@ -7,6 +7,8 @@ import (
 	"github.com/caledhwa/gongeal/config"
 	"github.com/caledhwa/gongeal/util"
 	"github.com/gorilla/context"
+	"github.com/hoisie/mustache"
+	"io/ioutil"
 )
 
 type SelectBackendMiddleware struct {
@@ -52,8 +54,29 @@ func (middleware *SelectBackendMiddleware) Handle(h http.Handler) http.Handler {
 				setBackendDefaults(capturedBackend)
 				util.PrintJson(capturedBackend)
 
+				params := context.Get(r,"templateParameters").(map[string]string)
+
+				log.Print("Printing template params...")
+				util.PrintJson(params)
+
 				// Render the target
-				// Render the cache key
+				log.Printf("Grabbing target: %v",capturedBackend.Target)
+				resp, err := http.Get(capturedBackend.Target)
+				if err != nil {
+					panic(err)
+				}
+				defer resp.Body.Close()
+				body, err := ioutil.ReadAll(resp.Body)
+				if err != nil {
+					panic(err)
+				}
+
+				log.Printf("Backend Target response code: %f",resp.Status)
+				renderedTarget := mustache.Render(string(body),params)
+				context.Set(r,"renderedTarget",renderedTarget)
+
+				// TODO: Caching of Backend
+
 			}
 		}
 

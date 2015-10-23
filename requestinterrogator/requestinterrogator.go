@@ -58,6 +58,11 @@ func (interrogator *RequestInterrogator) InterrogateRequest(request *http.Reques
 		params["cdn:url"] = interrogator.configCdn.URL
 	}
 
+	params["server:local"] = interrogator.configParams.Servers.Local
+
+	//TODO: Fix Environment being missing
+	params["environment"] = "development"
+
 	params["url:href"] = pageUrl
 
 	encodedParams := make(map[string]string)

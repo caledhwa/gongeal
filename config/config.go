@@ -29,6 +29,8 @@ type Backend struct {
 	Pattern string `json:"pattern"`
 	Target string `json:"target"`
 	Host string `json:"host"`
+	Timeout string `json:"timeout"`
+	CacheKey string `json:"cacheKey"`
 	TTL string `json:"ttl"`
 	QuietFailure *bool `json:"quietFailure"`
 	LeaveContentOnFail *bool `json:"leaveContentOnFail"`

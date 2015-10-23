@@ -24,10 +24,11 @@ func main() {
 
 	// Serves static pages
 	log.Println("Serving /static - serves html files for testing")
-	mux.Get("/static/:param", func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Filepath:%s\n",r.URL.Path[1:])
+	mux.Get("/:param", func(w http.ResponseWriter, r *http.Request) {
+		path := "static/" + r.URL.Path[1:]
+		log.Printf("Filepath:%s\n",path)
 		t1 := time.Now()
-		http.ServeFile(w, r, r.URL.Path[1:])
+		http.ServeFile(w, r, path)
 		t2 := time.Now()
 		log.Printf("[%s] %q %v\n", r.Method, r.URL.String(), t2.Sub(t1))
 	})

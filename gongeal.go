@@ -1,13 +1,14 @@
 package main
 
 import (
-	"net/http"
-	"github.com/justinas/alice"
-	"github.com/caledhwa/gongeal/middleware"
-	"github.com/caledhwa/gongeal/config"
-	"os"
 	"encoding/json"
+	"github.com/caledhwa/gongeal/config"
+	"github.com/caledhwa/gongeal/middleware"
+	"github.com/gorilla/context"
+	"github.com/justinas/alice"
 	"log"
+	"net/http"
+	"os"
 )
 
 func main() {
@@ -31,21 +32,23 @@ func main() {
 	// cookieParser
 	backendProxy := middleware.NewBackendProxyMiddleware(&configuration)
 
-	chain := alice.New(	dropFavicon.Handle,
-					   	interrogateRequest.Handle,
-						selectBackend.Handle,
-						rejectUnsupportedMediaTypes.Handle,
-						passthrough.Handle,
-						backendProxy.Handle).ThenFunc(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-						w.Write([]byte("Final handler - eventually backend Proxy"))
+	chain := alice.New(dropFavicon.Handle,
+		interrogateRequest.Handle,
+		selectBackend.Handle,
+		rejectUnsupportedMediaTypes.Handle,
+		passthrough.Handle,
+		backendProxy.Handle).ThenFunc(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		renderedTarget := context.Get(r, "renderedTarget").(string)
+		w.Write([]byte(renderedTarget))
 	}))
 
 	http.ListenAndServe(":8000", chain)
 }
 
-func selectGoogle (r *http.Request, parameters map[string]string) bool {
+func selectGoogle(r *http.Request, parameters map[string]string) bool {
 	log.Println("Executing the selectGoogle function")
-	if _,ok := parameters["query:google"] ; ok {
+	if _, ok := parameters["query:google"]; ok {
 		log.Println("Google Found.")
 		return true
 	} else {
