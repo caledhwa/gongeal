@@ -74,6 +74,7 @@ func (middleware *SelectBackendMiddleware) Handle(h http.Handler) http.Handler {
 
 					log.Printf("Backend Target response code: %f",resp.Status)
 					renderedTarget := mustache.Render(string(body),params)
+					log.Print(renderedTarget)
 					context.Set(r,"renderedTarget",renderedTarget)
 
 					// TODO: Caching of Backend
