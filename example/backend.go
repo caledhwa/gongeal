@@ -7,8 +7,7 @@ import (
 	"net/http"
 	"log"
 	"math/rand"
-	"encoding/json"
-	"io/ioutil"
+	"github.com/caledhwa/gongeal/util"
 	"github.com/drone/routes"
 )
 
@@ -42,7 +41,7 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintf(w, "This is some dynamic comment: %d-%02d-%02dT%02d:%02d:%02d-00:00", t.Year(), t.Month(), t.Day(),
 			t.Hour(), t.Minute(), t.Second())
-		logRequest(r)
+		util.LogRequest(r)
 	})
 
 	// 500
@@ -50,7 +49,7 @@ func main() {
 	mux.Get("/500", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, "This is an error.")
-		logRequest(r)
+		util.LogRequest(r)
 	})
 
 	// 403
@@ -58,7 +57,7 @@ func main() {
 	mux.Get("/403", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusForbidden)
 		fmt.Fprint(w, "Unauthorised error.")
-		logRequest(r)
+		util.LogRequest(r)
 	})
 
 	// Broken
@@ -71,7 +70,7 @@ func main() {
 			return
 		}
 		defer conn.Close()
-		logRequest(r)
+		util.LogRequest(r)
 	})
 
 	// 500
@@ -79,36 +78,36 @@ func main() {
 	mux.Get("/faulty", func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(100 * time.Millisecond)
 		if rand.Float32() > 0.5 {
-			writeHtmlOk(w)
+			util.WriteHtmlOk(w)
 			fmt.Fprint(w, "Faulty service managed to serve good content!")
 		} else {
 			w.Header().Set("Content-Type", "text/html")
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "Faulty Service Broken")
 		}
-		logRequest(r)
+		util.LogRequest(r)
 	})
 
 	fmt.Println("Serving /slow - Returns a delayed response (slow service)")
 	mux.Get("/slow", func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(200 * time.Millisecond)
-		writeHtmlOk(w)
+		util.WriteHtmlOk(w)
 		fmt.Fprint(w, "This is a slow service.")
-		logRequest(r)
+		util.LogRequest(r)
 	})
 
 	fmt.Println("Serving /post - Reflects a POST request")
 	mux.Post("/post", func(w http.ResponseWriter, r *http.Request) {
-		writeHtmlOk(w)
-		reflectHeaderAndBody(w, r)
-		logRequest(r)
+		util.WriteHtmlOk(w)
+		util.ReflectHeaderAndBody(w, r)
+		util.LogRequest(r)
 	})
 
 	fmt.Println("Serving /put - Reflects a PUT request")
 	mux.Put("/put", func(w http.ResponseWriter, r *http.Request) {
-		writeHtmlOk(w)
-		reflectHeaderAndBody(w, r)
-		logRequest(r)
+		util.WriteHtmlOk(w)
+		util.ReflectHeaderAndBody(w, r)
+		util.LogRequest(r)
 	})
 
 	fmt.Println("Serving /cdn - Simulates a CDN (Format:/cdn/:environment/:version/html/:file)")
@@ -116,7 +115,7 @@ func main() {
 		params := r.URL.Query()
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintf(w, "Environment: %s, Version: %s, File: %s", params.Get(":environment"), params.Get(":version"), params.Get(":file"))
-		logRequest(r)
+		util.LogRequest(r)
 	})
 
 	fmt.Println("Listening on" + port)
@@ -132,17 +131,3 @@ func main() {
 
 }
 
-func reflectHeaderAndBody(w http.ResponseWriter, r *http.Request) {
-	body, _ := ioutil.ReadAll(r.Body)
-	jsonHeader, _ := json.Marshal(r.Header)
-	fmt.Fprintf(w, "%s Data: %s<br/><pre>%s</pre>", r.Method, string(body), string(jsonHeader))
-}
-
-func logRequest(r *http.Request) {
-	log.Printf("[%s] %q \n", r.Method, r.URL.String())
-}
-
-func writeHtmlOk(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "text/html")
-	w.WriteHeader(http.StatusOK)
-}

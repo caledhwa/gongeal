@@ -13,6 +13,8 @@ install:
 - go get github.com/axw/gocov/gocov
 - go get github.com/mattn/goveralls
 - go get github.com/modocache/gover
+- go get github.com/gorilla/context
+- go get github.com/justinas/alice
 - go get -v github.com/onsi/ginkgo/ginkgo
 - export PATH=$PATH:$HOME/gopath/bin
 script:
