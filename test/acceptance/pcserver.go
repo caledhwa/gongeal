@@ -9,9 +9,15 @@ import (
 	"encoding/json"
 )
 
-func StartPageCompositionServer (port int, hostname string, eventHandler func()) {
+func StartPageCompositionServer (port int, hostname string, eventHandler func(), configFileName string) {
 
-	configFile, _ := os.Open("../common/testConfig.json")
+	if configFileName == "" {
+		configFileName = "testConfig"
+	}
+
+	configFilePath := "../common/" + configFileName + ".json"
+
+	configFile, _ := os.Open(configFilePath)
 
 	jsonParser := json.NewDecoder(configFile)
 	var configuration config.Config
