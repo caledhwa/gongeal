@@ -6,15 +6,15 @@ import (
 
 type ReliableGet struct {
 	config *config.Config
-	factory cache.CacheFactory
+	factory *cache.CacheFactory
 	cache cache.CacheEngine
 }
 
 func New(config *config.Config) *ReliableGet {
 	g := &ReliableGet{}
 	g.config = config
-	g.factory = &cache.CacheFactory{}
-	g.cache = g.factory.GetCache(g.config.Cache)
+	g.factory = cache.NewCacheFactory()
+	g.cache = g.factory.GetCache(&config.Cache)
 	return g
 }
 
