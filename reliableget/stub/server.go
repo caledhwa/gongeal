@@ -23,13 +23,10 @@ func StubServer(port int) {
 	mux := routes.New()
 
 	mux.Get("/broken", func(w http.ResponseWriter, r *http.Request) {
-		hj, _ := w.(http.Hijacker)
-		conn, _, err := hj.Hijack()
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		defer conn.Close()
+		// The Routes library doesn't allow hijacking
+		// With hijacking you can close the connection with no response
+		// To simulate a close with empty response, a panic will end the response empty
+		panic("Cannot close connection with empty response using github.com/drone/routes")
 	})
 
 	mux.Get("/faulty", faultyFunction)

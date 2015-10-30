@@ -21,17 +21,6 @@ func main() {
 
 	mux := routes.New()
 
-	// Serves static pages
-	log.Println("Serving /static - serves html files for testing")
-	mux.Get("/:param", func(w http.ResponseWriter, r *http.Request) {
-		path := "static/" + r.URL.Path[1:]
-		log.Printf("Filepath:%s\n",path)
-		t1 := time.Now()
-		http.ServeFile(w, r, path)
-		t2 := time.Now()
-		log.Printf("[%s] %q %v\n", r.Method, r.URL.String(), t2.Sub(t1))
-	})
-
 	// Example of a dynamic content for testing
 	log.Println("Serving /dynamic - Shows dynamic time content")
 	mux.Get("/dynamic", func(w http.ResponseWriter, r *http.Request) {
@@ -63,14 +52,10 @@ func main() {
 	// Broken
 	log.Println("Serving /broken - Rudely ends the request (Serves empty request)")
 	mux.Get("/broken", func(w http.ResponseWriter, r *http.Request) {
-		hj, _ := w.(http.Hijacker)
-		conn, _, err := hj.Hijack()
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		defer conn.Close()
-		util.LogRequest(r)
+		// The Routes library doesn't allow hijacking
+		// With hijacking you can close the connection with no response
+		// To simulate a close with empty response, a panic will end the response empty
+		panic("Cannot close connection with empty response using github.com/drone/routes")
 	})
 
 	// 500
@@ -116,6 +101,17 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintf(w, "Environment: %s, Version: %s, File: %s", params.Get(":environment"), params.Get(":version"), params.Get(":file"))
 		util.LogRequest(r)
+	})
+
+	// Serves static pages
+	log.Println("Serving /static - serves html files for testing")
+	mux.Get("/:param", func(w http.ResponseWriter, r *http.Request) {
+		path := "static/" + r.URL.Path[1:]
+		log.Printf("Filepath:%s\n",path)
+		t1 := time.Now()
+		http.ServeFile(w, r, path)
+		t2 := time.Now()
+		log.Printf("[%s] %q %v\n", r.Method, r.URL.String(), t2.Sub(t1))
 	})
 
 	fmt.Println("Listening on" + port)
