@@ -1,1 +1,1 @@
-package reliableget
+package reliableget_test

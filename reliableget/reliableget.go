@@ -1,38 +1,24 @@
 package reliableget
-import "net/http"
-
-type Config struct {
-	Cache Cache `json:cache`
-}
-
-type Cache struct {
-	Engine string `json:"engine"`
-	Url string `json:"url"`
-}
-
-type Options struct {
-	Timeout int
-	CacheKey string
-	CacheTTL int
-	ExplicitNoCache bool
-	Headers string
-	Tracer string
-	Type string
-	StatsdKey string
-	EventHandler func(error, *http.Response)
-}
+import (
+	"github.com/caledhwa/gongeal/reliableget/cache"
+	"github.com/caledhwa/gongeal/reliableget/config"
+)
 
 type ReliableGet struct {
-	config Config
+	config *config.Config
+	factory cache.CacheFactory
+	cache cache.CacheEngine
 }
 
-func NewReliableGet(config *Config) *ReliableGet {
-	m := &ReliableGet{}
-	m.config = config
-	return m
+func New(config *config.Config) *ReliableGet {
+	g := &ReliableGet{}
+	g.config = config
+	g.factory = &cache.CacheFactory{}
+	g.cache = g.factory.GetCache(g.config.Cache)
+	return g
 }
 
-func (r *ReliableGet) Get(Url string, options *Options) {
+func (r *ReliableGet) Get(Url string, options *config.Options) {
 
 }
 
