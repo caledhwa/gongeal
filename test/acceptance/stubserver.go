@@ -24,15 +24,6 @@ func StartStubServer (port int) {
 		util.LogRequest(r)
 	})
 
-//	mux.Get("/:param", func(w http.ResponseWriter, r *http.Request) {
-//		path := "../common/" + r.URL.Path[1:]
-//		log.Printf("Filepath:%s\n",path)
-//		t1 := time.Now()
-//		http.ServeFile(w, r, path)
-//		t2 := time.Now()
-//		log.Printf("[%s] %q %v\n", r.Method, r.URL.String(), t2.Sub(t1))
-//	})
-
 	mux.Get("/500", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, "500.")
@@ -66,14 +57,10 @@ func StartStubServer (port int) {
 	})
 
 	mux.Get("/broken", func(w http.ResponseWriter, r *http.Request) {
-		hj, _ := w.(http.Hijacker)
-		conn, _, err := hj.Hijack()
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		defer conn.Close()
-		util.LogRequest(r)
+		// The Routes library doesn't allow hijacking
+		// With hijacking you can close the connection with no response
+		// To simulate a close with empty response, a panic will end the response empty
+		panic("Cannot close connection with empty response using github.com/drone/routes")
 	})
 
 	mux.Get("/faulty", func(w http.ResponseWriter, r *http.Request) {
@@ -94,8 +81,6 @@ func StartStubServer (port int) {
 		util.LogRequest(r)
 	})
 
-
-
 	mux.Get("/302backend", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "test302.html")
 		util.LogRequest(r)
@@ -114,6 +99,15 @@ func StartStubServer (port int) {
 	mux.Get("/noCacheBackend", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "noCacheBackend.html")
 		util.LogRequest(r)
+	})
+
+	mux.Get("/:param", func(w http.ResponseWriter, r *http.Request) {
+		path := "../common/" + r.URL.Path[1:]
+		log.Printf("Filepath:%s\n",path)
+		t1 := time.Now()
+		http.ServeFile(w, r, path)
+		t2 := time.Now()
+		log.Printf("[%s] %q %v\n", r.Method, r.URL.String(), t2.Sub(t1))
 	})
 
 	server := &http.Server{Handler: mux}
