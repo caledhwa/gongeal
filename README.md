@@ -4,4 +4,6 @@
 
 Gongeal is an attempt at porting Compoxure (https://www.npmjs.com/package/compoxure) to Golang.
 
+This is a test.
+
 Compoxure is Copyright (c) 2014 TES GLobal http://tesglobal.com. Original source code is: https://github.com/tes/compoxure.
